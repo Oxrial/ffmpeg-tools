@@ -1,9 +1,7 @@
 <script>
-	import 'carbon-components-svelte/css/white.css'
 	import { invoke } from '@tauri-apps/api/core'
 	import { SortableList, SortableItem, sortItems } from '@rodrigodagostino/svelte-sortable-list'
-	import { Button, breakpoints } from 'carbon-components-svelte'
-
+	import { Card, CardBody, Button } from '@colorfuldots/svelteit'
 	let folderPath = ''
 	let files = []
 	let sortedFiles = []
@@ -49,30 +47,32 @@
 <main>
 	<h1>FLV 文件扫描与合并工具</h1>
 
-	<button on:click={selectFolder}>选择文件夹</button>
+	<Button color="info" onclick={selectFolder}>选择文件夹</Button>
 	<p>当前文件夹: {folderPath}</p>
 
 	<div>
-		<Button>Primary button</Button>
 		<h2>扫描到的 FLV 文件</h2>
-
-		<!-- 使用 SortableList 实现拖拽排序 -->
-		<SortableList on:sort={handleSort}>
-			{#each sortedFiles as file, index (file.id)}
-				<SortableItem {...file} {index}>
-					<li>
-						<span>{file.name}</span><span>{file.id}</span>
-						<button
-							on:click={() => {
-								file.delete ? undoDelete(index) : deleteFile(index)
-							}}>{file.delete ? '撤销' : '删除'}</button
-						>
-					</li>
-				</SortableItem>
-			{/each}
-		</SortableList>
-
-		<button on:click={confirmAndMerge}>确认排序并合并视频</button>
+		<div class="flv-list"></div>
+		<Card stacked class="flv-list">
+			<CardBody>
+				<!-- 使用 SortableList 实现拖拽排序 -->
+				<SortableList on:sort={handleSort}>
+					{#each sortedFiles as file, index (file.id)}
+						<SortableItem {...file} {index}>
+							<li>
+								<span>{file.name}</span><span>{file.id}</span>
+								<button
+									on:click={() => {
+										file.delete ? undoDelete(index) : deleteFile(index)
+									}}>{file.delete ? '撤销' : '删除'}</button
+								>
+							</li>
+						</SortableItem>
+					{/each}
+				</SortableList>
+			</CardBody>
+		</Card>
+		<Button onclick={confirmAndMerge}>确认排序并合并视频</Button>
 	</div>
 </main>
 
@@ -80,6 +80,10 @@
 	main {
 		padding: 20px;
 		font-family: Arial, sans-serif;
+		.flv-list {
+			min-height: calc(100vh - 25rem);
+			background: pink;
+		}
 	}
 	button {
 		margin: 5px;
