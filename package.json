@@ -15,7 +15,9 @@
 	"dependencies": {
 		"@rodrigodagostino/svelte-sortable-list": "^0.10.16",
 		"@tauri-apps/api": "^2",
-		"@tauri-apps/plugin-opener": "^2"
+		"@tauri-apps/plugin-opener": "^2",
+		"carbon-components-svelte": "^0.88.4",
+		"sass": "^1.86.3"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.6",
