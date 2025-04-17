@@ -1,7 +1,7 @@
 <script>
 	import { invoke } from '@tauri-apps/api/core'
 	import { SortableList, SortableItem, sortItems } from '@rodrigodagostino/svelte-sortable-list'
-	import { Card, CardBody, Button } from '@colorfuldots/svelteit'
+	import { Card, Button, Badge, Icon, Tooltip } from 'yesvelte'
 	let folderPath = ''
 	let files = []
 	let sortedFiles = []
@@ -10,7 +10,12 @@
 		try {
 			folderPath = await invoke('select_folder')
 			files = await invoke('scan_flv_files', { path: folderPath })
-			sortedFiles = files.map((f) => ({ name: f.substring(f.lastIndexOf('/') + 1), id: f, delete: false }))
+			sortedFiles = files.map((f) => ({
+				name: f.substring(f.lastIndexOf('/') + 1),
+				id: folderPath + f,
+				delete: false
+			}))
+			console.log('🚀 ~ selectFolder ~ files:', files)
 		} catch (error) {
 			alert(`Error: ${error}`)
 		}
@@ -45,32 +50,30 @@
 </script>
 
 <main>
-	<h1>FLV 文件扫描与合并工具</h1>
-
-	<Button color="info" onclick={selectFolder}>选择文件夹</Button>
-	<p>当前文件夹: {folderPath}</p>
-
+	<Button color="info" onclick={selectFolder}>选择文件夹 {folderPath}</Button>
 	<div>
-		<h2>扫描到的 FLV 文件</h2>
-		<div class="flv-list"></div>
-		<Card stacked class="flv-list">
-			<CardBody>
-				<!-- 使用 SortableList 实现拖拽排序 -->
-				<SortableList on:sort={handleSort}>
-					{#each sortedFiles as file, index (file.id)}
+		<Card class="flv-list">
+			<h2>扫描到的 FLV 文件</h2>
+			<!-- 使用 SortableList 实现拖拽排序 -->
+			<SortableList hasBoundaries on:sort={handleSort}>
+				{#each sortedFiles as file, index (file.id)}
+					<div>
 						<SortableItem {...file} {index}>
-							<li>
-								<span>{file.name}</span><span>{file.id}</span>
-								<button
+							<li class="flv-item">
+								<Badge ghost color="cyan">{file.name}</Badge>
+								<Badge ghost color="cyan">{file.id}</Badge>
+								<Tooltip placement="top" trigger="click">{file.id}</Tooltip>
+								<Icon
+									name="square-rounded-x"
 									on:click={() => {
 										file.delete ? undoDelete(index) : deleteFile(index)
-									}}>{file.delete ? '撤销' : '删除'}</button
+									}}>{file.delete ? '撤销' : '删除'}</Icon
 								>
 							</li>
 						</SortableItem>
-					{/each}
-				</SortableList>
-			</CardBody>
+					</div>
+				{/each}
+			</SortableList>
 		</Card>
 		<Button onclick={confirmAndMerge}>确认排序并合并视频</Button>
 	</div>
@@ -80,9 +83,14 @@
 	main {
 		padding: 20px;
 		font-family: Arial, sans-serif;
-		.flv-list {
+		:global(.flv-list) {
+			padding: 20px;
 			min-height: calc(100vh - 25rem);
-			background: pink;
+			:global(.flv-item) {
+				display: flex;
+				justify-content: space-evenly;
+				align-items: center;
+			}
 		}
 	}
 	button {
@@ -99,5 +107,9 @@
 	ul {
 		list-style-type: none;
 		padding: 0;
+		li {
+			display: flex;
+			justify-content: space-around;
+		}
 	}
 </style>
